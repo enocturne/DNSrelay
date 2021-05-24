@@ -1,0 +1,47 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AMOUNT	simplednsrelay.cpp	19;"	d	file:
+AdditionNum	simplednsrelay.cpp	/^    unsigned short AdditionNum;$/;"	m	struct:DNSHeader	file:
+AnswerNum	simplednsrelay.cpp	/^    unsigned short AnswerNum;$/;"	m	struct:DNSHeader	file:
+AuthorNum	simplednsrelay.cpp	/^    unsigned short AuthorNum;$/;"	m	struct:DNSHeader	file:
+BUF_SIZE	simplednsrelay.cpp	17;"	d	file:
+DEF_DNS_ADDRESS	simplednsrelay.cpp	14;"	d	file:
+DNSHDR	simplednsrelay.cpp	/^} DNSHDR, *pDNSHDR;$/;"	t	typeref:struct:DNSHeader	file:
+DNSHeader	simplednsrelay.cpp	/^typedef struct DNSHeader$/;"	s	file:
+DNS_PORT	simplednsrelay.cpp	16;"	d	file:
+DNS_table	simplednsrelay.cpp	/^Translate DNS_table[AMOUNT];		\/\/DNS域名解析表$/;"	v
+Day	simplednsrelay.cpp	/^int Day, Hour, Minute, Second, Milliseconds;\/\/保存系统时间的变量$/;"	v
+DisplayInfo	simplednsrelay.cpp	/^void DisplayInfo(unsigned short newID, int find)$/;"	f
+Flags	simplednsrelay.cpp	/^    unsigned short Flags;$/;"	m	struct:DNSHeader	file:
+GetTable	simplednsrelay.cpp	/^int GetTable(char *tablePath)$/;"	f
+GetUrl	simplednsrelay.cpp	/^void GetUrl(char *recvbuf, int recvnum)$/;"	f
+Hour	simplednsrelay.cpp	/^int Day, Hour, Minute, Second, Milliseconds;\/\/保存系统时间的变量$/;"	v
+ID	simplednsrelay.cpp	/^    unsigned short ID;$/;"	m	struct:DNSHeader	file:
+IDChange	simplednsrelay.cpp	/^typedef struct IDChange$/;"	s	file:
+IDTransTable	simplednsrelay.cpp	/^IDTransform IDTransTable[AMOUNT];	\/\/ID转换表$/;"	v
+IDTransform	simplednsrelay.cpp	/^} IDTransform;$/;"	t	typeref:struct:IDChange	file:
+IDcount	simplednsrelay.cpp	/^int IDcount = 0;					\/\/转换表中的条目个数$/;"	v
+IP	simplednsrelay.cpp	/^	string IP;						\/\/IP地址$/;"	m	struct:translate	file:
+IsFind	simplednsrelay.cpp	/^int IsFind(char* url, int num)$/;"	f
+LENGTH	simplednsrelay.cpp	18;"	d	file:
+LOCAL_ADDRESS	simplednsrelay.cpp	15;"	d	file:
+Milliseconds	simplednsrelay.cpp	/^int Day, Hour, Minute, Second, Milliseconds;\/\/保存系统时间的变量$/;"	v
+Minute	simplednsrelay.cpp	/^int Day, Hour, Minute, Second, Milliseconds;\/\/保存系统时间的变量$/;"	v
+NOTFOUND	simplednsrelay.cpp	20;"	d	file:
+QuestNum	simplednsrelay.cpp	/^    unsigned short QuestNum;$/;"	m	struct:DNSHeader	file:
+RegisterNewID	simplednsrelay.cpp	/^unsigned short RegisterNewID (unsigned short oID, SOCKADDR_IN temp, BOOL ifdone)$/;"	f
+Second	simplednsrelay.cpp	/^int Day, Hour, Minute, Second, Milliseconds;\/\/保存系统时间的变量$/;"	v
+Translate	simplednsrelay.cpp	/^} Translate;$/;"	t	typeref:struct:translate	file:
+client	simplednsrelay.cpp	/^	SOCKADDR_IN client;				\/\/请求者套接字地址$/;"	m	struct:IDChange	file:
+domain	simplednsrelay.cpp	/^	string domain;					\/\/域名$/;"	m	struct:translate	file:
+done	simplednsrelay.cpp	/^	BOOL done;						\/\/标记是否完成解析$/;"	m	struct:IDChange	file:
+main	simplednsrelay.cpp	/^int main(int argc, char** argv) $/;"	f
+oldID	simplednsrelay.cpp	/^	unsigned short oldID;			\/\/原有ID$/;"	m	struct:IDChange	file:
+pDNSHDR	simplednsrelay.cpp	/^} DNSHDR, *pDNSHDR;$/;"	t	typeref:struct:DNSHeader	file:
+sys	simplednsrelay.cpp	/^SYSTEMTIME sys;                     \/\/系统时间$/;"	v
+translate	simplednsrelay.cpp	/^typedef struct translate$/;"	s	file:
+url	simplednsrelay.cpp	/^char url[LENGTH];					\/\/域名$/;"	v

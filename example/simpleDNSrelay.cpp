@@ -288,7 +288,7 @@ int main(int argc, char** argv)
 
 		//接收DNS请求
 		iRecv = recvfrom(socketLocal, recvbuf, sizeof(recvbuf), 0, (SOCKADDR*)&clientName, &iLen_cli);
-
+		//iRecv = recvfrom(socketServer, recvbuf, sizeof(recvbuf), 0, (SOCKADDR *)&clientName, &iLen_cli);
 		if (iRecv == SOCKET_ERROR) {
 			cout << "Recvfrom Failed: " << WSAGetLastError() << endl;
 			continue;
@@ -305,7 +305,7 @@ int main(int argc, char** argv)
 			//在域名解析表中没有找到
 			if (find == NOTFOUND) {
 				//ID转换
-				unsigned short *pID = (unsigned short *)malloc(sizeof(unsigned short));
+				unsigned short *pID = (unsigned short *)malloc(sizeof(unsigned int));
 				memcpy(pID, recvbuf, sizeof(unsigned short));
 				unsigned short nID = htons(RegisterNewID(ntohs(*pID), clientName, FALSE));
 				memcpy(recvbuf, &nID, sizeof(unsigned short));
@@ -364,7 +364,7 @@ int main(int argc, char** argv)
 
 				//构造响应报文返回
 				memcpy(sendbuf, recvbuf, iRecv);						//拷贝请求报文
-				unsigned short a = htons(0x8180);
+				unsigned short a = htons(0x8180);//1000 0001 1000 0000
 				memcpy(&sendbuf[2], &a, sizeof(unsigned short));		//修改标志域
 
 				//修改回答数域

@@ -43,11 +43,14 @@ int main()
     //设置本地DNS和外部DNS两个套接字
     localName.sin_family = AF_INET;
     localName.sin_port = htons(DNS_PORT);
-    localName.sin_addr.s_addr = inet_addr(LOCAL_ADDRESS);
+    localName.sin_addr.s_addr = htonl(ADDR_ANY);
 
     serverName.sin_family = AF_INET;
     serverName.sin_port = htons(DNS_PORT);
     serverName.sin_addr.s_addr = inet_addr(outerDns);
+
+    unsigned value = 1;
+    setsockopt(socketLocal, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value));
 
     if (bind(socketLocal, (SOCKADDR *)&localName, sizeof(localName)))
     {

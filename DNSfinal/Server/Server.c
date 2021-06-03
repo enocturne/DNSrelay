@@ -47,6 +47,7 @@ int main()
     localName.sin_family = AF_INET;
     localName.sin_port = htons(DNS_PORT);
     localName.sin_addr.s_addr = inet_addr(LOCAL_ADDRESS);
+    //localName.sin_addr.s_addr = ADDR_ANY;
 
     serverName.sin_family = AF_INET;
     serverName.sin_port = htons(DNS_PORT);

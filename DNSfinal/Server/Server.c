@@ -1,15 +1,4 @@
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #include "relaysystem.h"
-#include <math.h>
-
-#pragma comment(lib, "Ws2_32.lib")
-
-#define DEF_DNS_ADDRESS "10.3.9.45" //外部DNS服务器地址
-#define LOCAL_ADDRESS "127.0.0.1"   //本地DNS服务器地址
-#define DNS_PORT 53               //进行DNS服务的53端口
-
-//*TODO 查询回复，构建请求报文，ID对应，生成ID
 
 int main()
 {
@@ -19,7 +8,7 @@ int main()
     WSADATA wsaData;
     SOCKET socketServer, socketLocal;              //本地DNS和外部DNS两个套接字
     SOCKADDR_IN serverName, clientName, localName; //本地DNS、外部DNS和请求端三个网络套接字地址
-    
+
     WSAStartup(MAKEWORD(2, 2), &wsaData);
 
     sys_ptr->idlb = 0;
@@ -46,7 +35,6 @@ int main()
     //设置本地DNS和外部DNS两个套接字
     localName.sin_family = AF_INET;
     localName.sin_port = htons(DNS_PORT);
-    //localName.sin_addr.s_addr = inet_addr(LOCAL_ADDRESS);
     localName.sin_addr.s_addr = htonl(INADDR_ANY);
 
     serverName.sin_family = AF_INET;
@@ -59,8 +47,6 @@ int main()
     if (bind(socketLocal, (SOCKADDR *)&localName, sizeof(localName)))
     {
         printf("Binding Port 53 failed.\n");
-        //printf("%s", GetLastError());
-
         exit(1);
     }
     else
@@ -123,8 +109,6 @@ int main()
         /**
          * 对于队列中的等待事件进行处理，处理完成后根据是否成功解析，标记为待发送READY和待中继RELAY两种状态
          */
-        //while (sys_ptr->eventQueue[sys_ptr->idub]->status != EMPTY)
-        //for (int j = 0; j < 10;j++)
         {
             for (int i = (sys_ptr->idlb + 1) % QSIZE; i != (sys_ptr->idub + 1) % QSIZE;)
             {
@@ -145,50 +129,35 @@ int main()
                 break;
                 case READY:
                 {
-                makeResponse(sys_ptr, sys_ptr->eventQueue[i], sys_ptr->eventQueue[i]->iRecv);
-                if (sys_ptr->eventQueue[i]->entry == -2)
-                {
-                    block(sys_ptr->eventQueue[i]);
-                }
-                int iSend = sendto(socketLocal, sys_ptr->eventQueue[i]->message, sys_ptr->eventQueue[i]->iRecv, 0, (SOCKADDR *)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
-                if (iSend == SOCKET_ERROR)
-                {
-                    printf("sendto Failed:%d\n", WSAGetLastError());
-                }
-                else if (iSend == 0)
-                {
-                    printf("\nsend none\n");
-                }
-                else
-                {
-                    sys_ptr->eventQueue[i]->status = EMPTY;
-                    printf("send %d succeess\n", iSend);
-                }
-                /*
-                    if (sys_ptr->eventQueue[i]->entry > 0)
+                    makeResponse(sys_ptr, sys_ptr->eventQueue[i], sys_ptr->eventQueue[i]->iRecv);
+                    if (sys_ptr->eventQueue[i]->entry == -2)
                     {
-                        unsigned char IPanswer[4];
-                        *(unsigned long *)IPanswer = (unsigned long)inet_addr(sys_ptr->entryTable[sys_ptr->eventQueue[i]->entry].ip);
-                        printf("%s\n", sys_ptr->entryTable[sys_ptr->eventQueue[i]->entry].ip);
-                        int iSend = sendto(socketLocal, IPanswer, 4, 0, (SOCKADDR *)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
-                        printf("send %d\n", iSend);
+                        block(sys_ptr->eventQueue[i]);
                     }
-                    else if (sys_ptr->eventQueue[i]->entry == -2)
+                    int iSend = sendto(socketLocal, sys_ptr->eventQueue[i]->message, sys_ptr->eventQueue[i]->iRecv, 0, (SOCKADDR *)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
+                    if (iSend == SOCKET_ERROR)
                     {
-                        char ipresponse[50] = "domain doesn't exist";
-                        int iSend = sendto(socketLocal, ipresponse, strlen(ipresponse), 0, (SOCKADDR *)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
-                        printf("send %d\n", iSend);
+                        printf("sendto Failed:%d\n", WSAGetLastError());
                     }
-                    */
+                    else if (iSend == 0)
+                    {
+                        printf("\nsend none\n");
+                    }
+                    else
+                    {
+                        sys_ptr->eventQueue[i]->status = EMPTY;
+                        printf("send %d succeess\n", iSend);
+                    }
+
                     sys_ptr->eventQueue[i]->status = EMPTY;
                     i = (i + 1) % QSIZE;
-                    break;
+                }
+                break;
                 case RELAY:
                 {
                     printf("\nRelaying\n");
                     unsigned char *id = sys_ptr->eventQueue[i]->message;
                     (*((octects *)id))++;
-
                     int iSend = sendto(socketServer, sys_ptr->eventQueue[i]->message, sys_ptr->eventQueue[i]->iRecv, 0, (SOCKADDR *)&serverName, sizeof(serverName));
                     printf("relay send %d of %d\n", iSend, sys_ptr->eventQueue[i]->iRecv);
                     if (iSend == SOCKET_ERROR)
@@ -199,15 +168,30 @@ int main()
                     {
                         printf("\nrelaysend none\n");
                     }
-
                     //接收来自外部DNS服务器的响应报文
                     IDevent relayEvent;
                     relayEvent.entry = sys_ptr->eventQueue[i]->entry;
                     relayEvent.client = sys_ptr->eventQueue[i]->client;
                     relayEvent.status = RELAY;
                     IDevent *relayEvent_ptr = &relayEvent;
-                    relayEvent.iRecv = recvfrom(socketServer, relayEvent_ptr->message, BUFSIZE * sizeof(char), 0, (SOCKADDR *)&relayEvent_ptr->client, &clien_Len);
 
+                    //relayEvent.iRecv = recvfrom(socketServer, relayEvent_ptr->message, BUFSIZE * sizeof(char), 0, (SOCKADDR*)&relayEvent_ptr->client, &clien_Len);
+                    int nNetTimeout = 2000;
+                    if (SOCKET_ERROR == setsockopt(socketServer, SOL_SOCKET, SO_RCVTIMEO, (char *)&nNetTimeout, sizeof(int)))
+                    {
+                        printf("Set Ser_RecTIMEO error !\r\n");
+                    }
+
+                    int ret = recvfrom(socketServer, relayEvent_ptr->message, BUFSIZE * sizeof(char), 0, (SOCKADDR *)&relayEvent_ptr->client, &clien_Len);
+                    if (ret < 0)
+                    {
+                        printf("recv timeout! %d\n", ret);
+                        break;
+                    }
+                    else
+                    {
+                        relayEvent.iRecv = ret;
+                    }
                     printf("relay from:%d\n", relayEvent.iRecv);
                     for (int k = 0; k < relayEvent.iRecv; k++)
                     {
@@ -224,9 +208,8 @@ int main()
                     unsigned char *idsend = sys_ptr->eventQueue[i]->message;
                     (*((octects *)idsend))--;
                     char *ip_ptr = &relayEvent_ptr->message[relayEvent_ptr->iRecv - 4];
-                    update(ip_ptr, relayEvent_ptr,sys_ptr);
-                    
-                    int relaySend = sendto(socketLocal, relayEvent_ptr->message, relayEvent_ptr->iRecv, 0, (SOCKADDR*)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
+                    update(ip_ptr, relayEvent_ptr, sys_ptr);
+                    int relaySend = sendto(socketLocal, relayEvent_ptr->message, relayEvent_ptr->iRecv, 0, (SOCKADDR *)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
                     if (iSend == SOCKET_ERROR)
                     {
                         printf("sendto Failed: %d\n", WSAGetLastError());
@@ -237,7 +220,7 @@ int main()
                     }
                     else
                     {
-                        printf("relay success %d\n", relaySend);    
+                        printf("relay success %d\n", relaySend);
                         IDevent tmp;
                         IDevent *tmp_ptr = &tmp;
                         sys_ptr->eventQueue[i] = tmp_ptr;
@@ -250,17 +233,16 @@ int main()
                 default:
                     break;
                 }
-                    while (1)
+                while (1)
+                {
+                    if (sys_ptr->eventQueue[(sys_ptr->idlb + 1) % QSIZE]->status == EMPTY && (sys_ptr->idlb + 1) % QSIZE != sys_ptr->idub)
                     {
-                        if (sys_ptr->eventQueue[(sys_ptr->idlb + 1) % QSIZE]->status == EMPTY && (sys_ptr->idlb + 1) % QSIZE != sys_ptr->idub)
-                        {
-                            sys_ptr->idlb = (sys_ptr->idlb + 1) % QSIZE;
-                            printf("complete event %d\n", sys_ptr->idlb);
-                        }
-                        else
-                        { 
-                            break;
-                        }
+                        sys_ptr->idlb = (sys_ptr->idlb + 1) % QSIZE;
+                        printf("complete event %d\n", sys_ptr->idlb);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }

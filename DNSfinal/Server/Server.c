@@ -46,16 +46,21 @@ int main()
     //设置本地DNS和外部DNS两个套接字
     localName.sin_family = AF_INET;
     localName.sin_port = htons(DNS_PORT);
-    localName.sin_addr.s_addr = inet_addr(LOCAL_ADDRESS);
-    //localName.sin_addr.s_addr = ADDR_ANY;
+    //localName.sin_addr.s_addr = inet_addr(LOCAL_ADDRESS);
+    localName.sin_addr.s_addr = htonl(INADDR_ANY);
 
     serverName.sin_family = AF_INET;
     serverName.sin_port = htons(DNS_PORT);
     serverName.sin_addr.s_addr = inet_addr(outerDns);
 
+    unsigned value = 1;
+    setsockopt(socketLocal, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value));
+
     if (bind(socketLocal, (SOCKADDR *)&localName, sizeof(localName)))
     {
         printf("Binding Port 53 failed.\n");
+        //printf("%s", GetLastError());
+
         exit(1);
     }
     else
@@ -86,12 +91,8 @@ int main()
 
         memset(&(recvEvent_ptr->client), 0, sizeof(SOCKADDR_IN));
         memset(recvEvent_ptr->message, 0, BUFSIZE * sizeof(char));
-        //char domainRecv[50];
         recvEvent_ptr->iRecv = recvfrom(socketLocal, recvEvent_ptr->message, BUFSIZ * sizeof(char), 0, (SOCKADDR *)&(recvEvent_ptr->client), &clien_Len);
 
-        //domainRecv[recvEvent_ptr->iRecv] = 0;
-        //printf("%d,%s\n", recvEvent_ptr->iRecv, domainRecv);
-        //queryInit(domainRecv, recvEvent_ptr, sys_ptr);
         for (int i = 0; i < recvEvent_ptr->iRecv; i++)
         {
             printf("%x ", recvEvent_ptr->message[i]);
@@ -226,8 +227,6 @@ int main()
                     char *ip_ptr = &relayEvent_ptr->message[relayEvent_ptr->iRecv - 4];
                     update(ip_ptr, relayEvent_ptr,sys_ptr);
                     
-                    //int relaySend = sendto(socketLocal, relayEvent_ptr->message, relayEvent.iRecv, 0, (SOCKADDR *)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));                
-                    //int relaySend = sendto(socketLocal, ip_ptr, 4, 0, (SOCKADDR *)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
                     int relaySend = sendto(socketLocal, relayEvent_ptr->message, relayEvent_ptr->iRecv, 0, (SOCKADDR*)&sys_ptr->eventQueue[i]->client, sizeof(sys_ptr->eventQueue[i]->client));
                     if (iSend == SOCKET_ERROR)
                     {

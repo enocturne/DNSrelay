@@ -220,7 +220,6 @@ int main()
                     }
                     unsigned char *idrelay = relayEvent_ptr->message;
                     (*((octects *)idrelay))--;
-                    //char *answer = &sys_ptr->eventQueue[i]->message[sys_ptr->eventQueue[i]->iRecv - 1];
                     memcpy(sys_ptr->eventQueue[i]->message, relayEvent_ptr->message, relayEvent_ptr->iRecv);
                     unsigned char *idsend = sys_ptr->eventQueue[i]->message;
                     (*((octects *)idsend))--;
